@@ -24,6 +24,7 @@ public class Practice11PieChartView extends View {
     private int r = 250;
     private int txtSize = 24;
     private int maxPos = 0;
+    private int pieDif = 20;
 
     public Practice11PieChartView(Context context) {
         super(context);
@@ -59,6 +60,8 @@ public class Practice11PieChartView extends View {
         datas.add(16);
         datas.add(5);
         datas.add(8);
+        datas.add(90);
+        datas.add(100);
 
         int sum = 0;
         for (int i = 0; i < datas.size();i++) {
@@ -83,13 +86,27 @@ public class Practice11PieChartView extends View {
         for (int i = 0; i < datas.size();i++) {
 
             // x y 相对于圆心
+
+            // 绘制饼图
+            RectF tempRectf = rectF;
+            int lineDif = 0;
+            if (maxPos == i) {
+                lineDif = pieDif;
+                double pieDifX = Math.cos((-total-datas.get(i)*per/2) * Math.PI / 180) * pieDif;
+                double pieDifY = Math.sin((-total-datas.get(i)*per/2) *  Math.PI / 180) * pieDif;
+                Log.i("point","--- " + pieDifX +"--- " + pieDifY);
+                tempRectf = new RectF(rectF.left+(float) pieDifX,rectF.top-(float)pieDifY,
+                        rectF.right+(float)pieDifX,rectF.bottom-(float)pieDifY);
+            }
+            paint.setColor(Color.parseColor("#"+getRandColorCode()));
+            canvas.drawArc(tempRectf,total,datas.get(i)*per,true,paint);
+
             //划斜线
+            double startX = Math.cos((-total-datas.get(i)*per/2) * Math.PI / 180) * (r+lineDif);
+            double startY = Math.sin((-total-datas.get(i)*per/2) *  Math.PI / 180) * (r+lineDif);
 
-            double startX = Math.cos((-total-datas.get(i)*per/2) * Math.PI / 180) * r;
-            double startY = Math.sin((-total-datas.get(i)*per/2) *  Math.PI / 180) * r;
-
-            double endX = Math.cos((-total-datas.get(i)*per/2) * Math.PI / 180) * (r+30);
-            double endY = Math.sin((-total-datas.get(i)*per/2) *  Math.PI / 180) * (r+30);
+            double endX = Math.cos((-total-datas.get(i)*per/2) * Math.PI / 180) * (r+30 + lineDif);
+            double endY = Math.sin((-total-datas.get(i)*per/2) *  Math.PI / 180) * (r+30 + lineDif);
 
             txtPaint.setColor(Color.parseColor("#EBEBEB"));
             canvas.drawLine((float) (getWidth()/2 + startX),(float) (getHeight()/2-startY),
@@ -107,13 +124,7 @@ public class Practice11PieChartView extends View {
             canvas.drawText(datas.get(i)+"",(float)( getWidth()/2+txtX)+hLength,(float)(getHeight()/2-txtY    ),txtPaint );
 
 
-            // 绘制饼图
-            RectF tempRectf = rectF;
-            if (maxPos == i) {
-                tempRectf = new RectF(rectF.left,rectF.top+10,rectF.right,rectF.bottom+10);
-            }
-            paint.setColor(Color.parseColor("#"+getRandColorCode()));
-            canvas.drawArc(tempRectf,total,datas.get(i)*per,true,paint);
+
 
             total+= datas.get(i) * per;
         }
