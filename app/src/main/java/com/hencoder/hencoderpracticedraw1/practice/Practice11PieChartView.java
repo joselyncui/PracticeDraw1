@@ -19,12 +19,12 @@ public class Practice11PieChartView extends View {
     private Paint txtPaint;
 
     private List<Integer> datas = new ArrayList<>();
-    private float per;
+    private float per;//单位角度
     private RectF rectF;
-    private int r = 250;
-    private int txtSize = 24;
-    private int maxPos = 0;
-    private int pieDif = 20;
+    private int r = 250;//饼图 半径
+    private int txtSize = 24;//文字大小
+    private int maxVal = 0;//标记最大值
+    private int pieDif = 20;//最大扇形偏移量
 
     public Practice11PieChartView(Context context) {
         super(context);
@@ -56,6 +56,7 @@ public class Practice11PieChartView extends View {
         datas.add(40);
         datas.add(3);
         datas.add(20);
+        datas.add(100);
         datas.add(51);
         datas.add(16);
         datas.add(5);
@@ -66,9 +67,8 @@ public class Practice11PieChartView extends View {
         int sum = 0;
         for (int i = 0; i < datas.size();i++) {
             sum += datas.get(i);
-            maxPos = datas.get(maxPos) > datas.get(i)? maxPos:i;
+            maxVal = Math.max(maxVal, datas.get(i));
         }
-
         per = 360.0f/sum;
     }
 
@@ -76,25 +76,23 @@ public class Practice11PieChartView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
+//        练习内容：使用各种 Canvas.drawXXX() 方法画饼图
+
         if (rectF == null) {
             rectF = new RectF(getWidth()/2-r,getHeight()/2-r,getWidth()/2+r,getHeight()/2+r);
         }
-//        综合练习
-//        练习内容：使用各种 Canvas.drawXXX() 方法画饼图
-        int dif = 0;
+
         float total = 0;
         for (int i = 0; i < datas.size();i++) {
 
-            // x y 相对于圆心
-
-            // 绘制饼图
+            // 绘制饼图 x y 相对于圆心
             RectF tempRectf = rectF;
             int lineDif = 0;
-            if (maxPos == i) {
+            if (maxVal == datas.get(i)) {
                 lineDif = pieDif;
                 double pieDifX = Math.cos((-total-datas.get(i)*per/2) * Math.PI / 180) * pieDif;
                 double pieDifY = Math.sin((-total-datas.get(i)*per/2) *  Math.PI / 180) * pieDif;
-                Log.i("point","--- " + pieDifX +"--- " + pieDifY);
+
                 tempRectf = new RectF(rectF.left+(float) pieDifX,rectF.top-(float)pieDifY,
                         rectF.right+(float)pieDifX,rectF.bottom-(float)pieDifY);
             }
@@ -122,9 +120,6 @@ public class Practice11PieChartView extends View {
             double txtX = endX>0?endX + 10: endX-txtWidth-10;
             double txtY = endY-txtSize/2;
             canvas.drawText(datas.get(i)+"",(float)( getWidth()/2+txtX)+hLength,(float)(getHeight()/2-txtY    ),txtPaint );
-
-
-
 
             total+= datas.get(i) * per;
         }
